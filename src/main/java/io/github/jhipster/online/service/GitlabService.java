@@ -49,7 +49,6 @@ import org.springframework.util.StopWatch;
 
 @Service
 public class GitlabService implements GitProviderService {
-
     private final Logger log = LoggerFactory.getLogger(GitlabService.class);
 
     private final GeneratorService generatorService;
@@ -264,8 +263,9 @@ public class GitlabService implements GitProviderService {
         throws IOException {
         log.info("Creating Merge Request on repository {} / {}", group, repositoryName);
         GitlabAPI gitlab = getConnection(user);
-        int number = gitlab.getProject(group, repositoryName).getId();
-        GitlabMergeRequest mergeRequest = gitlab.createMergeRequest(number, branchName, "main", null, title);
+        GitlabProject gitlabProject = gitlab.getProject(group, repositoryName);
+        int projectId = gitlabProject.getId();
+        GitlabMergeRequest mergeRequest = gitlab.createMergeRequest(projectId, branchName, gitlabProject.getDefaultBranch(), null, title);
         log.info("Merge Request created!");
         return mergeRequest.getIid();
     }
